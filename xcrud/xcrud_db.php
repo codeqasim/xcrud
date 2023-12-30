@@ -1,16 +1,10 @@
 <?php
-
-// $uri = explode('/', $_SERVER['REQUEST_URI']);
-// $expo_uri = $uri[1];
-// require_once $_SERVER['DOCUMENT_ROOT'].'/'.$expo_uri.'/admin/_config.php';
-
-include_once __DIR__ . "../../__config.php";
-
+/** Database driver; f0ska xCRUD v.1.6.26; 03/2015 */
 class Xcrud_db
 {
-    private static $_instance = array();
+     private static $_instance = array();
     private $connect;
-    public  $result;
+    public $result;
     private $dbhost;
     private $dbuser;
     private $dbpass;
@@ -33,10 +27,10 @@ class Xcrud_db
         {
             if (!is_array($params))
             {
-                $dbuser = username;
-                $dbpass = password;
-                $dbname = dbname;
-                $dbhost = server;
+                $dbuser = Xcrud_config::$dbuser;
+                $dbpass = Xcrud_config::$dbpass;
+                $dbname = Xcrud_config::$dbname;
+                $dbhost = Xcrud_config::$dbhost;
                 $dbencoding = Xcrud_config::$dbencoding;
             }
             self::$_instance[$instance_name] = new self($dbuser, $dbpass, $dbname, $dbhost, $dbencoding);
@@ -45,7 +39,7 @@ class Xcrud_db
     }
     private function __construct($dbuser, $dbpass, $dbname, $dbhost, $dbencoding)
     {
-//        $this->magic_quotes = get_magic_quotes_runtime();
+        //$this->magic_quotes = get_magic_quotes_runtime();
         if (strpos($dbhost, ':') !== false)
         {
             list($host, $port) = explode(':', $dbhost, 2);
@@ -53,9 +47,7 @@ class Xcrud_db
             $this->connect = mysqli_connect($host, $dbuser, $dbpass, $dbname, $socks[1] ? $socks[1] : null, $socks[2] ? $socks[2] : null);
         }
         else
-
-        $this->connect = mysqli_connect(server, username, password, dbname);
-
+            $this->connect = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
         if (!$this->connect)
             $this->error('Connection error. Can not connect to database');
         $this->connect->set_charset($dbencoding);
@@ -143,9 +135,6 @@ class Xcrud_db
                     return '\'' . $this->connect->real_escape_string($val) . '\'';
                     break;
                 default:
-
-                if (empty($val)) {$val="";}
-
                     if (trim($val) == '')
                     {
                         if ($null)
